@@ -11,6 +11,9 @@ pub struct Malloced<T: ?Sized> {
     ptr: NonNull<T>,
 }
 
+unsafe impl<T: ?Sized + Send> Send for Malloced<T> {}
+unsafe impl<T: ?Sized + Sync> Sync for Malloced<T> {}
+
 impl<T: ?Sized> Drop for Malloced<T> {
     #[inline]
     fn drop(&mut self) {
