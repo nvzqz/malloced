@@ -1,0 +1,5 @@
+[package]
+name = "malloced"
+version = "0.0.0"
+authors = ["Nikolai Vazquez <hello@nikolaivazquez.com>"]
+edition = "2018"
