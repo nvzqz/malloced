@@ -55,3 +55,17 @@ impl<T: ?Sized> AsMut<T> for Malloced<T> {
         self
     }
 }
+
+impl<T: ?Sized> core::borrow::Borrow<T> for Malloced<T> {
+    #[inline]
+    fn borrow(&self) -> &T {
+        self
+    }
+}
+
+impl<T: ?Sized> core::borrow::BorrowMut<T> for Malloced<T> {
+    #[inline]
+    fn borrow_mut(&mut self) -> &mut T {
+        self
+    }
+}
