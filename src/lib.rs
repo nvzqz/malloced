@@ -69,3 +69,19 @@ impl<T: ?Sized> core::borrow::BorrowMut<T> for Malloced<T> {
         self
     }
 }
+
+impl<T: ?Sized> Malloced<T> {
+    /// Constructs an instance from a raw `malloc`-ed pointer.
+    ///
+    /// # Safety
+    ///
+    /// The data referenced by `ptr` must be valid and must have been allocated
+    /// by `malloc` so that it can be `free`-d on
+    /// [`Drop`](https://doc.rust-lang.org/std/ops/trait.Drop.html).
+    #[inline]
+    pub unsafe fn from_raw(ptr: *mut T) -> Self {
+        Self {
+            ptr: NonNull::new_unchecked(ptr),
+        }
+    }
+}
