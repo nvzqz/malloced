@@ -41,3 +41,17 @@ impl<T: ?Sized> core::ops::DerefMut for Malloced<T> {
         unsafe { self.ptr.as_mut() }
     }
 }
+
+impl<T: ?Sized> AsRef<T> for Malloced<T> {
+    #[inline]
+    fn as_ref(&self) -> &T {
+        self
+    }
+}
+
+impl<T: ?Sized> AsMut<T> for Malloced<T> {
+    #[inline]
+    fn as_mut(&mut self) -> &mut T {
+        self
+    }
+}
