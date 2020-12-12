@@ -5,6 +5,8 @@ use core::{
     ptr::{self, NonNull},
 };
 
+mod sys;
+
 /// A pointer type for `malloc`-ed heap allocation.
 #[repr(transparent)]
 pub struct Malloced<T: ?Sized> {
@@ -17,14 +19,10 @@ unsafe impl<T: ?Sized + Sync> Sync for Malloced<T> {}
 impl<T: ?Sized> Drop for Malloced<T> {
     #[inline]
     fn drop(&mut self) {
-        extern "C" {
-            fn free(ptr: *mut c_void);
-        }
-
         let ptr = self.ptr.as_ptr();
         unsafe {
             ptr::drop_in_place(ptr);
-            free(ptr as *mut c_void);
+            sys::free(ptr as *mut c_void);
         }
     }
 }
