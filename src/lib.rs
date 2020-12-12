@@ -25,3 +25,19 @@ impl<T: ?Sized> Drop for Malloced<T> {
         }
     }
 }
+
+impl<T: ?Sized> core::ops::Deref for Malloced<T> {
+    type Target = T;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        unsafe { self.ptr.as_ref() }
+    }
+}
+
+impl<T: ?Sized> core::ops::DerefMut for Malloced<T> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { self.ptr.as_mut() }
+    }
+}
