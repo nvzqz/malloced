@@ -2,6 +2,7 @@
 
 use core::{
     ffi::c_void,
+    fmt,
     ptr::{self, NonNull},
 };
 
@@ -68,6 +69,27 @@ impl<T: ?Sized> core::borrow::BorrowMut<T> for Malloced<T> {
     #[inline]
     fn borrow_mut(&mut self) -> &mut T {
         self
+    }
+}
+
+impl<T: ?Sized + fmt::Debug> fmt::Debug for Malloced<T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        T::fmt(self, f)
+    }
+}
+
+impl<T: ?Sized + fmt::Display> fmt::Display for Malloced<T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        T::fmt(self, f)
+    }
+}
+
+impl<T: ?Sized> fmt::Pointer for Malloced<T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.ptr.fmt(f)
     }
 }
 
