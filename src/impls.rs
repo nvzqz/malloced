@@ -6,6 +6,9 @@ use core::{
     ptr,
 };
 
+#[cfg(feature = "pin")]
+use core::pin::Pin;
+
 unsafe impl<T: ?Sized + Send> Send for Malloced<T> {}
 unsafe impl<T: ?Sized + Sync> Sync for Malloced<T> {}
 
@@ -68,6 +71,14 @@ impl From<Malloced<str>> for Malloced<[u8]> {
     #[inline]
     fn from(m: Malloced<str>) -> Self {
         unsafe { Self::from_raw(Malloced::into_raw(m) as *mut [u8]) }
+    }
+}
+
+#[cfg(feature = "pin")]
+impl<T: ?Sized> From<Malloced<T>> for Pin<Malloced<T>> {
+    #[inline]
+    fn from(m: Malloced<T>) -> Self {
+        Malloced::into_pin(m)
     }
 }
 

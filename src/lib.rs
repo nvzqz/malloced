@@ -5,6 +5,9 @@ use std as core;
 
 use core::{any::Any, mem::ManuallyDrop, ptr::NonNull};
 
+#[cfg(feature = "pin")]
+use core::pin::Pin;
+
 mod impls;
 mod sys;
 
@@ -46,6 +49,21 @@ impl<T: ?Sized> Malloced<T> {
     #[inline]
     pub fn into_raw(this: Self) -> *mut T {
         Self::leak(this)
+    }
+
+    /// Converts a `Malloced<T>` into a `Pin<Malloced<T>>`
+    ///
+    /// This conversion does not allocate on the heap and happens in place.
+    ///
+    /// This is also available via
+    /// [`From`](https://doc.rust-lang.org/std/convert/trait.From.html).
+    #[inline]
+    #[cfg(feature = "pin")]
+    pub fn into_pin(this: Self) -> Pin<Malloced<T>> {
+        // SAFETY: It's not possible to move or replace the insides of a
+        // `Pin<Malloced<T>>` when `T: !Unpin`, so it's safe to pin it directly
+        // without any additional requirements.
+        unsafe { Pin::new_unchecked(this) }
     }
 
     /// Consumes and leaks the instance, returning a mutable reference,
