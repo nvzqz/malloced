@@ -2,6 +2,9 @@
 name = "malloced"
 version = "0.0.0"
 authors = ["Nikolai Vazquez <hello@nikolaivazquez.com>"]
+repository = "https://github.com/nvzqz/malloced"
+homepage = "https://github.com/nvzqz/malloced"
+documentation = "https://docs.rs/malloced"
 description = "A malloc-ed box pointer type."
 categories = ["no-std", "memory-management", "api-bindings"]
 keywords = ["malloc", "free", "c", "array", "ffi"]
