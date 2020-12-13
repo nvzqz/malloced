@@ -3,7 +3,7 @@
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{mem::ManuallyDrop, ptr::NonNull};
+use core::{any::Any, mem::ManuallyDrop, ptr::NonNull};
 
 mod impls;
 mod sys;
@@ -125,5 +125,31 @@ impl<T> Malloced<[T]> {
     #[inline]
     pub unsafe fn slice_from_raw_parts(data: *mut T, len: usize) -> Self {
         Self::from_raw(core::slice::from_raw_parts_mut(data, len))
+    }
+}
+
+impl Malloced<dyn Any> {
+    /// Attempt to downcast the instance to a concrete type.
+    #[inline]
+    pub fn downcast<T: Any>(self) -> Result<Malloced<T>, Self> {
+        if self.is::<T>() {
+            let raw: *mut dyn Any = Malloced::into_raw(self);
+            Ok(unsafe { Malloced::from_raw(raw as *mut T) })
+        } else {
+            Err(self)
+        }
+    }
+}
+
+impl Malloced<dyn Any + Send> {
+    /// Attempt to downcast the instance to a concrete type.
+    #[inline]
+    pub fn downcast<T: Any>(self) -> Result<Malloced<T>, Self> {
+        if self.is::<T>() {
+            let raw: *mut (dyn Any + Send) = Malloced::into_raw(self);
+            Ok(unsafe { Malloced::from_raw(raw as *mut T) })
+        } else {
+            Err(self)
+        }
     }
 }
