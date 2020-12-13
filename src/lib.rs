@@ -3,6 +3,7 @@
 use core::{
     ffi::c_void,
     fmt,
+    hash::{Hash, Hasher},
     ptr::{self, NonNull},
 };
 
@@ -138,6 +139,85 @@ impl<T: ?Sized + Ord> Ord for Malloced<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         T::cmp(self, other)
+    }
+}
+
+impl<T: ?Sized + Hash> Hash for Malloced<T> {
+    #[inline]
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        T::hash(self, state);
+    }
+}
+
+impl<T: ?Sized + Hasher> Hasher for Malloced<T> {
+    #[inline]
+    fn finish(&self) -> u64 {
+        T::finish(self)
+    }
+
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        T::write(self, bytes)
+    }
+
+    #[inline]
+    fn write_u8(&mut self, i: u8) {
+        T::write_u8(self, i)
+    }
+
+    #[inline]
+    fn write_u16(&mut self, i: u16) {
+        T::write_u16(self, i)
+    }
+
+    #[inline]
+    fn write_u32(&mut self, i: u32) {
+        T::write_u32(self, i)
+    }
+
+    #[inline]
+    fn write_u64(&mut self, i: u64) {
+        T::write_u64(self, i)
+    }
+
+    #[inline]
+    fn write_u128(&mut self, i: u128) {
+        T::write_u128(self, i)
+    }
+
+    #[inline]
+    fn write_usize(&mut self, i: usize) {
+        T::write_usize(self, i)
+    }
+
+    #[inline]
+    fn write_i8(&mut self, i: i8) {
+        T::write_i8(self, i)
+    }
+
+    #[inline]
+    fn write_i16(&mut self, i: i16) {
+        T::write_i16(self, i)
+    }
+
+    #[inline]
+    fn write_i32(&mut self, i: i32) {
+        T::write_i32(self, i)
+    }
+
+    #[inline]
+    fn write_i64(&mut self, i: i64) {
+        T::write_i64(self, i)
+    }
+
+    #[inline]
+    fn write_i128(&mut self, i: i128) {
+        T::write_i128(self, i)
+    }
+
+    #[inline]
+    fn write_isize(&mut self, i: isize) {
+        T::write_isize(self, i)
     }
 }
 
