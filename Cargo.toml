@@ -3,3 +3,7 @@ name = "malloced"
 version = "0.0.0"
 authors = ["Nikolai Vazquez <hello@nikolaivazquez.com>"]
 categories = ["no-std"]
+
+[features]
+default = ["std"]
+std = []
