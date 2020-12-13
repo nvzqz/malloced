@@ -64,6 +64,13 @@ impl<T: ?Sized> core::borrow::BorrowMut<T> for Malloced<T> {
     }
 }
 
+impl From<Malloced<str>> for Malloced<[u8]> {
+    #[inline]
+    fn from(m: Malloced<str>) -> Self {
+        unsafe { Self::from_raw(Malloced::into_raw(m) as *mut [u8]) }
+    }
+}
+
 impl<T: ?Sized + fmt::Debug> fmt::Debug for Malloced<T> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
