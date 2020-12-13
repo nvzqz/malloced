@@ -107,6 +107,40 @@ impl<T: ?Sized + PartialEq> PartialEq for Malloced<T> {
 
 impl<T: ?Sized + Eq> Eq for Malloced<T> {}
 
+impl<T: ?Sized + PartialOrd> PartialOrd for Malloced<T> {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        T::partial_cmp(self, other)
+    }
+
+    #[inline]
+    fn lt(&self, other: &Self) -> bool {
+        T::lt(self, other)
+    }
+
+    #[inline]
+    fn le(&self, other: &Self) -> bool {
+        T::le(self, other)
+    }
+
+    #[inline]
+    fn ge(&self, other: &Self) -> bool {
+        T::ge(self, other)
+    }
+
+    #[inline]
+    fn gt(&self, other: &Self) -> bool {
+        T::gt(self, other)
+    }
+}
+
+impl<T: ?Sized + Ord> Ord for Malloced<T> {
+    #[inline]
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        T::cmp(self, other)
+    }
+}
+
 impl<T: ?Sized> Malloced<T> {
     /// Constructs an instance from a raw `malloc`-ed pointer.
     ///
