@@ -9,6 +9,17 @@ mod impls;
 mod sys;
 
 /// A pointer type for `malloc`-ed heap allocation.
+///
+/// # Memory layout
+///
+/// So long as `T: Sized`, a `Malloced<T>` is guaranteed to be represented as a
+/// single pointer and is also ABI-compatible with C pointers (i.e. the C type
+/// `T*`). This means that if you have extern "C" Rust functions that will be
+/// called from C, you can define those Rust functions using `Malloced<T>`
+/// types, and use `T*` as corresponding type on the C side.
+///
+/// Regardless if `T: Sized`, a `Malloced<T>` is guaranteed to be ABI-compatible
+/// with [`NonNull<T>`](https://doc.rust-lang.org/std/ptr/struct.NonNull.html).
 #[repr(transparent)]
 pub struct Malloced<T: ?Sized> {
     ptr: NonNull<T>,
