@@ -28,6 +28,18 @@ impl<T: ?Sized> Malloced<T> {
             ptr: NonNull::new_unchecked(ptr),
         }
     }
+
+    /// Returns an immutable raw pointer to the data.
+    #[inline]
+    pub fn as_ptr(this: &Self) -> *const T {
+        this.ptr.as_ptr()
+    }
+
+    /// Returns a mutable raw pointer to the data.
+    #[inline]
+    pub fn as_mut_ptr(this: &mut Self) -> *mut T {
+        this.ptr.as_ptr()
+    }
 }
 
 impl<T> Malloced<[T]> {
