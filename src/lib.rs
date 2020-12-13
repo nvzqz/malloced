@@ -3,7 +3,7 @@
 #[cfg(feature = "std")]
 use std as core;
 
-use core::ptr::NonNull;
+use core::{mem, ptr::NonNull};
 
 mod impls;
 mod sys;
@@ -27,6 +27,16 @@ impl<T: ?Sized> Malloced<T> {
         Self {
             ptr: NonNull::new_unchecked(ptr),
         }
+    }
+
+    /// Consumes the instance, returning a wrapped raw pointer.
+    ///
+    /// The pointer will be properly aligned and non-null.
+    #[inline]
+    pub fn into_raw(this: Self) -> *mut T {
+        let ptr = this.ptr.as_ptr();
+        mem::forget(this);
+        ptr
     }
 
     /// Returns an immutable raw pointer to the data.
