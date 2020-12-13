@@ -3,7 +3,7 @@
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{mem, ptr::NonNull};
+use core::{mem::ManuallyDrop, ptr::NonNull};
 
 mod impls;
 mod sys;
@@ -34,9 +34,32 @@ impl<T: ?Sized> Malloced<T> {
     /// The pointer will be properly aligned and non-null.
     #[inline]
     pub fn into_raw(this: Self) -> *mut T {
-        let ptr = this.ptr.as_ptr();
-        mem::forget(this);
-        ptr
+        Self::leak(this)
+    }
+
+    /// Consumes and leaks the instance, returning a mutable reference,
+    /// `&'a mut T`.
+    ///
+    /// Note that the type `T` must outlive the chosen lifetime `'a`. If the
+    /// type has only static references, or none at all, then this may be chosen
+    /// to be `'static`.
+    ///
+    /// This function is mainly useful for data that lives for the remainder of
+    /// the program's life. Dropping the returned reference will cause a memory
+    /// leak. If this is not acceptable, the reference should first be wrapped
+    /// with the [`Malloced::from_raw`](#method.from_raw) function producing a
+    /// `Malloced`. This `Malloced` can then be dropped which will properly
+    /// destroy `T` and `free` the allocated memory.
+    ///
+    /// Note: this is an associated function, which means that you have to call
+    /// it as `Malloced::leak(this)` instead of `this.leak()`. This is so that
+    /// there is no conflict with a method on the inner type.
+    #[inline]
+    pub fn leak<'a>(this: Self) -> &'a mut T
+    where
+        T: 'a,
+    {
+        unsafe { &mut *ManuallyDrop::new(this).ptr.as_ptr() }
     }
 
     /// Returns an immutable raw pointer to the data.
