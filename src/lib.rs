@@ -93,6 +93,20 @@ impl<T: ?Sized> fmt::Pointer for Malloced<T> {
     }
 }
 
+impl<T: ?Sized + PartialEq> PartialEq for Malloced<T> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        T::eq(self, other)
+    }
+
+    #[inline]
+    fn ne(&self, other: &Self) -> bool {
+        T::ne(self, other)
+    }
+}
+
+impl<T: ?Sized + Eq> Eq for Malloced<T> {}
+
 impl<T: ?Sized> Malloced<T> {
     /// Constructs an instance from a raw `malloc`-ed pointer.
     ///
