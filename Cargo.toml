@@ -3,6 +3,7 @@ name = "malloced"
 version = "0.0.0"
 authors = ["Nikolai Vazquez <hello@nikolaivazquez.com>"]
 license = "MIT OR Apache-2.0"
+readme = "README.md"
 repository = "https://github.com/nvzqz/malloced"
 homepage = "https://github.com/nvzqz/malloced"
 documentation = "https://docs.rs/malloced"
