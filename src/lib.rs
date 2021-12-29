@@ -78,7 +78,7 @@
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{any::Any, mem::ManuallyDrop, ptr::NonNull};
+use core::{any::Any, mem::ManuallyDrop, ptr::NonNull, marker::PhantomData};
 
 #[cfg(feature = "pin")]
 use core::pin::Pin;
@@ -101,6 +101,9 @@ mod sys;
 #[repr(transparent)]
 pub struct Malloced<T: ?Sized> {
     ptr: NonNull<T>,
+
+    // Marks ownership of an instance of T.
+    _marker: PhantomData<T>,
 }
 
 impl<T: ?Sized> Malloced<T> {
@@ -115,6 +118,7 @@ impl<T: ?Sized> Malloced<T> {
     pub unsafe fn from_raw(ptr: *mut T) -> Self {
         Self {
             ptr: NonNull::new_unchecked(ptr),
+            _marker: PhantomData,
         }
     }
 
