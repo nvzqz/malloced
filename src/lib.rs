@@ -26,7 +26,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! malloced = "1.0.1"
+//! malloced = "1.1.0"
 //! ```
 //!
 //! The star of the show is [`Malloced`], [`Box`]-like pointer that calls `free` on

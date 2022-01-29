@@ -28,7 +28,7 @@ can be used by adding the following to your project's
 
 ```toml
 [dependencies]
-malloced = "1.0.1"
+malloced = "1.1.0"
 ```
 
 The star of the show is [`Malloced`], [`Box`]-like pointer that calls `free` on
@@ -72,4 +72,4 @@ at your choosing.
 
 [`Box`]: https://doc.rust-lang.org/std/boxed/struct.Box.html
 [`Drop`]: https://doc.rust-lang.org/std/ops/trait.Drop.html
-[`Malloced`]: https://docs.rs/malloced/1.0.1/malloced/struct.Malloced.html
+[`Malloced`]: https://docs.rs/malloced/1.1.0/malloced/struct.Malloced.html
