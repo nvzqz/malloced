@@ -78,13 +78,16 @@
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{any::Any, mem::ManuallyDrop, ptr::NonNull, marker::PhantomData};
+use core::{any::Any, marker::PhantomData, mem, mem::ManuallyDrop, ptr::NonNull};
 
 #[cfg(feature = "pin")]
 use core::pin::Pin;
 
 mod impls;
+mod iter;
 mod sys;
+
+pub use iter::*;
 
 /// A pointer type for `malloc`-ed heap allocation.
 ///
@@ -104,6 +107,42 @@ pub struct Malloced<T: ?Sized> {
 
     // Marks ownership of an instance of T.
     _marker: PhantomData<T>,
+}
+
+impl<T> IntoIterator for Malloced<[T]> {
+    type Item = T;
+    type IntoIter = SliceIter<T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        unsafe {
+            let buf = self.ptr.cast::<T>();
+
+            let len = self.len();
+
+            mem::forget(self);
+
+            let ptr = buf.as_ptr();
+
+            let end = if mem::size_of::<T>() == 0 {
+                // Purposefully don't use `ptr.offset` because for slices with
+                // 0-size elements this would return the same pointer.
+                //
+                // Use wrapping arithmetic to avoid the requirement of the
+                // result pointer being in the same allocation.
+                (ptr as *mut i8).wrapping_add(len) as *mut T
+            } else {
+                ptr.add(len)
+            };
+
+            SliceIter {
+                buf,
+                marker: PhantomData,
+                ptr,
+                end,
+            }
+        }
+    }
 }
 
 impl<T: ?Sized> Malloced<T> {
