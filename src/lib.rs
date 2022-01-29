@@ -248,6 +248,31 @@ impl<T: ?Sized> Malloced<T> {
     pub fn as_mut_ptr(this: &mut Self) -> *mut T {
         this.ptr.as_ptr()
     }
+
+    // TODO: Implement `core::ops::CoerceUnsized`.
+    // See https://github.com/rust-lang/rust/issues/27732.
+
+    /// Erases the static type `T`.
+    #[inline]
+    pub fn into_any(this: Self) -> Malloced<dyn Any>
+    where
+        T: Sized + Any,
+    {
+        let ptr = this.ptr.as_ptr() as *mut dyn Any;
+        mem::forget(this);
+        unsafe { Malloced::from_raw(ptr) }
+    }
+
+    /// Erases the static type `T`.
+    #[inline]
+    pub fn into_any_send(this: Self) -> Malloced<dyn Any + Send + Sync>
+    where
+        T: Sized + Any + Send + Sync,
+    {
+        let ptr = this.ptr.as_ptr() as *mut (dyn Any + Send + Sync);
+        mem::forget(this);
+        unsafe { Malloced::from_raw(ptr) }
+    }
 }
 
 impl<T> Malloced<[T]> {
