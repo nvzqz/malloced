@@ -15,4 +15,4 @@ keywords = ["malloc", "free", "c", "array", "ffi"]
 [features]
 default = ["std"]
 std = []
-pin = [] # MSRV: 1.33
+pin = [] # Does nothing; kept for compatibility.

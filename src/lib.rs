@@ -79,10 +79,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{any::Any, marker::PhantomData, mem, mem::ManuallyDrop, ptr::NonNull};
-
-#[cfg(feature = "pin")]
-use core::pin::Pin;
+use core::{any::Any, marker::PhantomData, mem, mem::ManuallyDrop, pin::Pin, ptr::NonNull};
 
 mod impls;
 mod iter;
@@ -208,7 +205,6 @@ impl<T: ?Sized> Malloced<T> {
     /// This is also available via
     /// [`From`](https://doc.rust-lang.org/std/convert/trait.From.html).
     #[inline]
-    #[cfg(feature = "pin")]
     pub fn into_pin(this: Self) -> Pin<Malloced<T>> {
         // SAFETY: It's not possible to move or replace the insides of a
         // `Pin<Malloced<T>>` when `T: !Unpin`, so it's safe to pin it directly
