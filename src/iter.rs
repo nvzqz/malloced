@@ -110,8 +110,54 @@ impl<T> DoubleEndedIterator for SliceIter<T> {
 impl<T> ExactSizeIterator for SliceIter<T> {
     #[inline]
     fn len(&self) -> usize {
-        (self.end as usize).wrapping_sub(self.ptr as usize)
+        let diff = (self.end as usize).wrapping_sub(self.ptr as usize);
+
+        match diff.checked_div(mem::size_of::<T>()) {
+            Some(len) => len,
+
+            // ZST
+            None => diff,
+        }
     }
 }
 
 impl<T> core::iter::FusedIterator for SliceIter<T> {}
+
+#[cfg(test)]
+mod tests {
+    use crate::Malloced;
+
+    mod len {
+        use super::*;
+
+        #[track_caller]
+        fn test(slice: &[impl Copy]) {
+            let iter = Malloced::alloc(slice).unwrap().into_iter();
+            assert_eq!(iter.len(), slice.len());
+        }
+
+        #[test]
+        fn zst() {
+            test(&[()]);
+            test(&[(), ()]);
+        }
+
+        #[test]
+        fn u8() {
+            test(&[1u8]);
+            test(&[1u8, 2u8]);
+        }
+
+        #[test]
+        fn u16() {
+            test(&[1u16]);
+            test(&[1u16, 2u16]);
+        }
+
+        #[test]
+        fn usize() {
+            test(&[1usize]);
+            test(&[1usize, 2usize]);
+        }
+    }
+}

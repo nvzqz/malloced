@@ -145,6 +145,37 @@ impl<T> IntoIterator for Malloced<[T]> {
     }
 }
 
+/// Testing helpers.
+impl<T: ?Sized> Malloced<T> {
+    #[cfg(test)]
+    fn alloc(values: &[T]) -> Option<Malloced<[T]>>
+    where
+        T: Copy,
+    {
+        let value_size = mem::size_of::<T>();
+        let alloc_size = values.len().checked_mul(value_size.max(1))?;
+
+        unsafe {
+            let buf = sys::malloc(alloc_size).cast::<T>();
+            if buf.is_null() {
+                return None;
+            }
+
+            for (i, &value) in values.iter().enumerate() {
+                let ptr: *mut T = if value_size == 0 {
+                    buf.cast::<u8>().add(i).cast()
+                } else {
+                    buf.add(i)
+                };
+
+                ptr.write(value);
+            }
+
+            Some(Malloced::slice_from_raw_parts(buf, values.len()))
+        }
+    }
+}
+
 impl<T: ?Sized> Malloced<T> {
     /// Constructs an instance from a raw `malloc`-ed pointer.
     ///
