@@ -152,8 +152,8 @@ impl<T> IntoIterator for Malloced<[T]> {
 }
 
 /// Testing helpers.
+#[cfg(test)]
 impl<T: ?Sized> Malloced<T> {
-    #[cfg(test)]
     fn alloc(values: &[T]) -> Option<Malloced<[T]>>
     where
         T: Copy,
