@@ -1,6 +1,6 @@
 [package]
 name = "malloced"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["Nikolai Vazquez <hello@nikolaivazquez.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
