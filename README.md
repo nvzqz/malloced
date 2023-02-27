@@ -40,7 +40,7 @@ use malloced::Malloced;
 
 ## MSRV
 
-This library's minimum supported Rust version (MSRV) is 1.42. A new version
+This library's minimum supported Rust version (MSRV) is 1.64. A new version
 requirement would result in a minor version update.
 
 ## FFI Safety

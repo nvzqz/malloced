@@ -38,7 +38,7 @@
 //!
 //! # MSRV
 //!
-//! This library's minimum supported Rust version (MSRV) is 1.42. A new version
+//! This library's minimum supported Rust version (MSRV) is 1.64. A new version
 //! requirement would result in a minor version update.
 //!
 //! # FFI Safety
@@ -79,7 +79,15 @@ extern crate alloc;
 #[cfg(feature = "std")]
 use std as core;
 
-use core::{any::Any, marker::PhantomData, mem, mem::ManuallyDrop, pin::Pin, ptr::NonNull};
+use core::{
+    any::Any,
+    ffi::{c_char, CStr},
+    marker::PhantomData,
+    mem,
+    mem::ManuallyDrop,
+    pin::Pin,
+    ptr::NonNull,
+};
 
 mod impls;
 mod iter;
@@ -317,6 +325,27 @@ impl<T> Malloced<[T]> {
     }
 }
 
+impl Malloced<CStr> {
+    /// Wraps a raw `malloc`ed C string with a safe owned C string wrapper.
+    ///
+    /// # Safety
+    ///
+    /// See [`CStr::from_ptr` safety docs](CStr::from_ptr).
+    #[inline]
+    pub unsafe fn from_ptr(ptr: *mut c_char) -> Self {
+        // If `&CStr` is a thin pointer, use a dummy length that is discarded.
+        let len = if mem::size_of::<*mut CStr>() == mem::size_of::<*mut c_char>() {
+            1
+        } else {
+            CStr::from_ptr(ptr).to_bytes_with_nul().len()
+        };
+
+        let ptr = core::ptr::slice_from_raw_parts_mut(ptr, len) as *mut CStr;
+
+        Self::from_raw(ptr)
+    }
+}
+
 impl Malloced<dyn Any> {
     /// Attempt to downcast the instance to a concrete type.
     #[inline]
@@ -352,6 +381,24 @@ impl Malloced<dyn Any + Send + Sync> {
             Ok(unsafe { Malloced::from_raw(raw as *mut T) })
         } else {
             Err(self)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod c_str {
+        use super::*;
+
+        #[test]
+        fn from_ptr() {
+            let buf = Malloced::<c_char>::alloc(&[b'h' as _, b'i' as _, 0]).unwrap();
+            let ptr = ManuallyDrop::new(buf).ptr.as_ptr() as *mut c_char;
+
+            let result = unsafe { Malloced::<CStr>::from_ptr(ptr) };
+            assert_eq!(result.to_bytes(), b"hi");
         }
     }
 }
