@@ -342,3 +342,16 @@ impl Malloced<dyn Any + Send> {
         }
     }
 }
+
+impl Malloced<dyn Any + Send + Sync> {
+    /// Attempt to downcast the instance to a concrete type.
+    #[inline]
+    pub fn downcast<T: Any>(self) -> Result<Malloced<T>, Self> {
+        if self.is::<T>() {
+            let raw: *mut (dyn Any + Send + Sync) = Malloced::into_raw(self);
+            Ok(unsafe { Malloced::from_raw(raw as *mut T) })
+        } else {
+            Err(self)
+        }
+    }
+}
