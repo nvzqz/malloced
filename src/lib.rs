@@ -38,10 +38,8 @@
 //!
 //! # MSRV
 //!
-//! This library's minimum supported Rust version (MSRV) is 1.30. A new version
+//! This library's minimum supported Rust version (MSRV) is 1.42. A new version
 //! requirement would result in a minor version update.
-//!
-//! If the `pin` feature is enabled, the MSRV is 1.33.
 //!
 //! # FFI Safety
 //!
@@ -294,7 +292,7 @@ impl<T> Malloced<[T]> {
     /// for details.
     #[inline]
     pub unsafe fn slice_from_raw_parts(data: *mut T, len: usize) -> Self {
-        Self::from_raw(core::slice::from_raw_parts_mut(data, len))
+        Self::from_raw(core::ptr::slice_from_raw_parts_mut(data, len))
     }
 }
 

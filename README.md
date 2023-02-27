@@ -40,10 +40,8 @@ use malloced::Malloced;
 
 ## MSRV
 
-This library's minimum supported Rust version (MSRV) is 1.30. A new version
+This library's minimum supported Rust version (MSRV) is 1.42. A new version
 requirement would result in a minor version update.
-
-If the `pin` feature is enabled, the MSRV is 1.33.
 
 ## FFI Safety
 
