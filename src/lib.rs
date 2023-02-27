@@ -153,8 +153,8 @@ impl<T> IntoIterator for Malloced<[T]> {
 
 /// Testing helpers.
 #[cfg(test)]
-impl<T: ?Sized> Malloced<T> {
-    fn alloc(values: &[T]) -> Option<Malloced<[T]>>
+impl<T> Malloced<[T]> {
+    fn alloc(values: &[T]) -> Option<Self>
     where
         T: Copy,
     {
@@ -394,7 +394,7 @@ mod tests {
 
         #[test]
         fn from_ptr() {
-            let buf = Malloced::<c_char>::alloc(&[b'h' as _, b'i' as _, 0]).unwrap();
+            let buf = Malloced::<[c_char]>::alloc(&[b'h' as _, b'i' as _, 0]).unwrap();
             let ptr = ManuallyDrop::new(buf).ptr.as_ptr() as *mut c_char;
 
             let result = unsafe { Malloced::<CStr>::from_ptr(ptr) };
