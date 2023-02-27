@@ -126,6 +126,42 @@ impl<T> core::iter::FusedIterator for SliceIter<T> {}
 #[cfg(test)]
 mod tests {
     use crate::Malloced;
+    use alloc::vec::Vec;
+    use core::fmt::Debug;
+
+    mod collect {
+        use super::*;
+
+        #[track_caller]
+        fn test<T: Copy + Debug + PartialEq>(slice: &[T]) {
+            let result: Vec<T> = Malloced::alloc(slice).unwrap().into_iter().collect();
+            assert_eq!(result, slice);
+        }
+
+        #[test]
+        fn zst() {
+            test(&[()]);
+            test(&[(), ()]);
+        }
+
+        #[test]
+        fn u8() {
+            test(&[1u8]);
+            test(&[1u8, 2u8]);
+        }
+
+        #[test]
+        fn u16() {
+            test(&[1u16]);
+            test(&[1u16, 2u16]);
+        }
+
+        #[test]
+        fn usize() {
+            test(&[1usize]);
+            test(&[1usize, 2usize]);
+        }
+    }
 
     mod len {
         use super::*;

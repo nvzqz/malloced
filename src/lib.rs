@@ -75,6 +75,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(test)]
+extern crate alloc;
+
 #[cfg(feature = "std")]
 use std as core;
 
